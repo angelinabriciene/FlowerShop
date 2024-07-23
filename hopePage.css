@@ -1,0 +1,26 @@
+#header {
+    display: block;
+    font-size: 60px;
+    font-style: italic;
+    text-align: center;
+    height: 100px;
+}
+
+#searchBar {
+    margin-top: 30px;
+    margin-left: 5px;
+}
+
+#menuSideBar {
+margin-top: 5px;
+}
+
+.card {
+    margin-top: 20px;
+    display: inline-block;
+}
+
+#flowerName{
+    color: brown;
+    font-weight: bold;
+}

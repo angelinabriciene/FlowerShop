@@ -1,0 +1,34 @@
+#createFlowerForm {
+    width: 50%;
+    margin-left: 20px;
+}
+
+#descriptionNew {
+    width: 100%;
+    height: 100px;
+}
+
+input {
+    margin: 10px;
+}
+
+textarea {
+    margin: 10px;
+}
+
+.form-check {
+    margin: 10px;
+}
+
+#flowerType {
+    margin: 10px;
+}
+
+#colorOptionHeader {
+    margin-top: 20px;
+    margin-left: 10px;
+}
+
+#submitNewFlower {
+    margin-top: 10px;
+}

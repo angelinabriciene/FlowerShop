@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update item</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./create.css">
+    <script defer src="./main.js"></script>
+</head>
+
+<body>
+    <form id="updateFlowerForm">
+        <div class="form-group">
+            <input id="updatedflowerName" class="form-control" type="text" placeholder="Augalo pavadinimas">
+            <input id="updatedlatinName" class="form-control" type="text" placeholder="Augalo lotyniškas vardas">
+            <textarea id="updateddescription" type="text" placeholder="Trumpas augalo aprašymas"></textarea>
+            <input id="updatedprice" class="form-control" type="text" id="updatedprice" placeholder="Kaina" pattern="[0-9]+(\.[0-9]+)?">
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="updatedperennialOption" value="true" checked>
+            <label class="form-check-label" for="exampleRadios1">
+                Daugiametis
+            </label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="radio" name="exampleRadios" id="updatedannualOption" value="false" checked>
+            <label class="form-check-label" for="exampleRadios1">
+                Vienmetis
+            </label>
+        </div>
+        <div>
+            <label for="flowerType"></label>
+            <select id="updatedflowerType" class="form-control">
+                <option selected>Augalo tipas</option>
+                <option value="1">Vaiskrūmiai</option>
+                <option value="2">Vaismedžiai</option>
+                <option value="3">Vijokliniai</option>
+                <option value="4">Dekoratyviniai</option>
+                <option value="5">Spygliuočiai</option>
+                <option value="6">Daržovių sėklos</option>
+                <option value="7">Gėlių sėklos</option>
+                <option value="8">Prieskoniai</option>
+                <option value="9">Kambariniai augalai</option>
+                <option value="10">Grybai</option>
+                <option value="11">Medžiai</option>
+            </select>
+        </div>
+        <div id="colorOptionHeader">Pasirinkite vieną ar kelias spalvas:</div>
+        <div class="form-check form-check">
+            <input id="updatedflowerColor" class="form-check-input" type="checkbox" id="flowerColorOption1" value="1">
+            <label class="form-check-label" for="inlineCheckbox1">Raudona</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption2" value="2">
+            <label class="form-check-label">Geltona</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption3" value="3">
+            <label class="form-check-label">Rožinė</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption4" value="4">
+            <label class="form-check-label">Balta</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption5" value="5">
+            <label class="form-check-label">Purpurinė</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption6" value="6">
+            <label class="form-check-label">Mėlyna</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption7" value="7">
+            <label class="form-check-label">Žalia</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption8" value="8">
+            <label class="form-check-label">Oranžinė</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption10" value="10">
+            <label class="form-check-label">Dryžuota</label>
+        </div>
+        <div class="form-check form-check">
+            <input class="form-check-input" type="checkbox" id="flowerColorOption11" value="11">
+            <label class="form-check-label">Taškuota</label>
+        </div>
+        <div>
+            <label for="flowerPosition"></label>
+            <select id="updatedflowerPosition" class="form-control">
+                <option selected>Sodinimo / laikymo vieta</option>
+                <option value="1">Saulėta</option>
+                <option value="2">Pusiau saulėta</option>
+                <option value="3">Pavėsyje</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="exampleFormControlFile1">Prisekite augalo nuotrauką</label>
+            <input type="file" class="form-control-file" id="exampleFormControlFile1">
+        </div>
+        <div>
+            <button id="submitUpdatedFlower" type="submit" class="btn btn-primary">Atnaujinti</button>
+        </div>
+    </form>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</body>
+
+</html>
