@@ -23,6 +23,9 @@ function showAlert(status) {
     }, 3000);
 }
 
+let currentPage = 1;
+const itemsPerPage = 5;
+
 async function fetchFlowers() {
     try {
         const response = await axios.get(apiUrl);
@@ -30,13 +33,16 @@ async function fetchFlowers() {
         const flowerList = document.getElementById('flower-list');
         flowerList.innerHTML = '';
 
-        flowers.forEach(flower => {
+        const paginatedFlowers = paginate(flowers, currentPage, itemsPerPage);
+
+        paginatedFlowers.forEach(flower => {
             const flowerRow = `
             <a href="oneFlower.html?id=${flower.id}">
                 <div class="card" style="width: 18rem;">
                     <img class="card-img-top" src="green.jpg" alt="Card image cap">
                      <div class="card-body">
                      <p id="flowerName" class="card-text">${flower.name}</p>
+                     <p id="flowerName" class="card-text">${flower.plant}</p>
                     <p id="flowerPrice" class="card-text"> Kaina: ${flower.price} €</p>
                 </div>
             </div>
@@ -44,9 +50,36 @@ async function fetchFlowers() {
      `;
             flowerList.insertAdjacentHTML('beforeend', flowerRow);
         });
+
+        const paginationButtons = document.getElementById('pagination-buttons');
+        paginationButtons.innerHTML = '';
+
+        const totalPages = Math.ceil(flowers.length / itemsPerPage);
+
+        for (let i = 1; i <= totalPages; i++) {
+            const button = document.createElement('button');
+            button.textContent = i;
+            button.className = 'pagination-button';
+
+            if (i == currentPage) {
+                button.classList.add('active');
+            }
+
+            button.addEventListener('click', () => {
+                currentPage = i;
+                fetchFlowers();
+            });
+            paginationButtons.appendChild(button);
+        }
     } catch (error) {
         console.error('Error fetching flowers:', error);
     }
+}
+
+function paginate(array, page, itemsPerPage) {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return array.slice(startIndex, endIndex);
 }
 
 async function displayFlowerInfo() {
@@ -56,13 +89,18 @@ async function displayFlowerInfo() {
         const flower = response.data;
         const flowerInfo = document.getElementById('flower-info');
         flowerInfo.innerHTML = `
-          <img src="green.jpg">
-          <h2>${flower.name}, ${flower.latinName}</h2>
-          <p>Aprašas?: ${flower.family}</p>
-          <p>Kaina: ${flower.price} €</p>
-          <a href="./update.html?id=${flower.id}" class="btn btn-warning">Redaguoti</a>
-          <button class="btn btn-danger" id="deleteFlower">Ištrinti</button>
-        `;
+                    <div class="flower-container">
+                        <img class="flower-image" src="green.jpg">
+                        <div class="flower-details">
+                        <h2>${flower.name}, ${flower.plant}</h2>
+                        <p>Kaina: ${flower.price} €</p>
+                        <p>Aprašas: ${flower.family}</p>
+                        <p>Spalva: ${flower.colorId}</p>
+                        <a href="./update.html?id=${flower.id}" class="btn btn-warning">Redaguoti</a>
+                        <button class="btn btn-danger" id="deleteFlower">Ištrinti</button>
+                        </div>
+                    </div>
+                    `;
 
         const deleteButton = document.getElementById('deleteFlower');
         deleteButton.addEventListener('click', async () => {
@@ -75,7 +113,7 @@ async function displayFlowerInfo() {
 
 async function saveFlower() {
     const name = document.getElementById('flowerName').value;
-    const latinName = document.getElementById('latinName').value;
+    const plant = document.getElementById('plant').value;
     const family = document.getElementById('descriptionNew').value;
     const price = document.getElementById('price').value;
     let perennial;
@@ -99,7 +137,7 @@ async function saveFlower() {
 
     const flower = {
         name,
-        latinName,
+        plant,
         family,
         price,
         perennial,
@@ -110,7 +148,7 @@ async function saveFlower() {
 
     try {
         await axios.post(apiUrl, flower);
-        window.location.href = "http://127.0.0.1:5500/view/homePage.html";
+        window.location.href = "http://127.0.0.1:5500/view/homePage.html?info=u";
         showAlert(" išsaugota")
     } catch (error) {
         console.error('Error saving flower:', error);
@@ -121,9 +159,19 @@ async function deleteFlower() {
     const flowerId = new URLSearchParams(window.location.search).get('id');
     try {
         await axios.delete(`${apiUrl}/${flowerId}`);
-        window.location.href = "http://127.0.0.1:5500/view/homePage.html";
-        showAlert(" ištrinta");
+        window.location.href = "http://127.0.0.1:5500/view/homePage.html?info=d";
+
     } catch (error) {
         console.error('Error deleting author:', error);
     }
+}
+
+if (window.location.href.includes("info=d")) {
+    console.log("pasirodyk");
+    showAlert(" ištrinta");
+}
+
+if (window.location.href.includes("info=u")) {
+    console.log("pasirodyk");
+    showAlert(" išsaugota");
 }

@@ -12,7 +12,7 @@
 }
 
 #menuSideBar {
-margin-top: 5px;
+    margin-top: 5px;
 }
 
 .card {
@@ -20,7 +20,30 @@ margin-top: 5px;
     display: inline-block;
 }
 
-#flowerName{
+#flowerName {
     color: brown;
     font-weight: bold;
+}
+
+.pagination-button {
+    margin: 5px;
+    color: black;
+    background-color: #f1f1f1;
+    border: none;
+    padding: 8px 16px;
+    text-decoration: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.pagination-button:hover {
+    background-color: #ddd;
+}
+
+.pagination-button.active {
+    background-color: #007bff; 
+    color: #ffffff; 
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
 }

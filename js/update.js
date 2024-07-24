@@ -52,7 +52,7 @@ window.onload = async function () {
 
 function populateForm(flower) {
     document.getElementById('updatedflowerName').value = flower.name;
-    document.getElementById('updatedlatinName').value = flower.latinName;
+    document.getElementById('updatedplant').value = flower.plant;
     document.getElementById('updateddescription').value = flower.family;
     document.getElementById('updatedprice').value = flower.price;
 
@@ -78,9 +78,10 @@ function populateForm(flower) {
     });
 }
 
-async function saveFlower(flowerId) {
+async function saveFlower() {
+    const flowerId = new URLSearchParams(window.location.search).get('id');
     const name = document.getElementById('updatedflowerName').value;
-    const latinName = document.getElementById('updatedlatinName').value;
+    const plant = document.getElementById('updatedplant').value;
     const family = document.getElementById('updateddescription').value;
     const price = document.getElementById('updatedprice').value;
     let perennial;
@@ -104,7 +105,7 @@ async function saveFlower(flowerId) {
 
     const flower = {
         name,
-        latinName,
+        plant,
         family,
         price,
         perennial,
@@ -114,13 +115,9 @@ async function saveFlower(flowerId) {
     };
 
     try {
-        if (flowerId) {
             console.log('saveFlower iškviesta id:', flowerId);
             await axios.put(`${apiUrl}/${flowerId}`, flower);
-        } else {
-            await axios.post(apiUrl, flower);
-        }
-
+        
         window.location.href = "http://127.0.0.1:5500/view/homePage.html";
     } catch (error) {
         console.error('Error saving flower:', error);

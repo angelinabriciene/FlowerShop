@@ -1,0 +1,23 @@
+.flower-image {
+    width: 700px;
+    height: auto;
+}
+
+.flower-container {
+    margin: 50px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+.flower-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.flower-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
