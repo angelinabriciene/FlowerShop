@@ -4,17 +4,22 @@ if (window.location.href.includes("homePage")) {
     fetchFlowers();
 }
 
-document.getElementById("submitNewFlower").addEventListener("click", function (event) {
-    saveFlower();
-    event.preventDefault();
-});
+try {
+    document.getElementById("submitNewFlower").addEventListener("click", function (event) {
+        saveFlower();
+        event.preventDefault();
+    });
+} catch (Exception) { }
 
-function showAlert(message) {
-    let alertMessage = document.getElementById("alert-message");
-    alertMessage.textContent = message;
-    alertMessage.classList.add("show");
-    setTimeout(function () {
-        alertMessage.classList.remove("show");
+function showAlert(status) {
+    const alertsContainer = document.getElementById('alert-message');
+    alertsContainer.innerHTML = `
+        <div class="alert alert-success">
+            <strong>Success!</strong> Prekė sėkmingai  ${status}.
+        </div>
+    `;
+    setTimeout(() => {
+        alertsContainer.innerHTML = '';
     }, 3000);
 }
 
@@ -55,13 +60,9 @@ async function displayFlowerInfo() {
           <h2>${flower.name}, ${flower.latinName}</h2>
           <p>Aprašas?: ${flower.family}</p>
           <p>Kaina: ${flower.price} €</p>
-          <button class="btn btn-warning" id="updateFlower">Atnaujinti</button>
+          <a href="./update.html?id=${flower.id}" class="btn btn-warning">Redaguoti</a>
           <button class="btn btn-danger" id="deleteFlower">Ištrinti</button>
         `;
-        const updateButton = document.getElementById('updateFlower');
-        updateButton.addEventListener('click', async () => {
-            fetchFlowerData();
-        });
 
         const deleteButton = document.getElementById('deleteFlower');
         deleteButton.addEventListener('click', async () => {
@@ -72,66 +73,7 @@ async function displayFlowerInfo() {
     }
 }
 
-async function fetchFlowerData() {
-    const flowerId = new URLSearchParams(window.location.search).get('id');
-    try {
-        const response = await axios.get(`http://localhost:8080/api/flowers/${flowerId}`);
-        const flower = response.data;
-
-        localStorage.setItem('flowerData', JSON.stringify(flower));
-
-        console.log(flower);
-
-        window.location.href = "http://127.0.0.1:5500/update.html";
-
-    } catch (error) {
-        console.error('Error fetching flower:', error);
-    }
-}
-document.addEventListener('DOMContentLoaded', fillForm);
-
-function fillForm() {
-    const flowerId = new URLSearchParams(window.location.search).get('id');
-            window.location.href = `http://127.0.0.1:5500/update.html?id=${flowerId}`;
-    const flowerData = localStorage.getItem('flowerData');
-
-console.log(flowerData);
-
-    if (flowerData) {
-        const flower = JSON.parse(flowerData);
-
-        document.getElementById('updatedflowerName').value = flowerData.name;
-        document.getElementById('updatedlatinName').value = flowerData.latinName;
-        document.getElementById('updateddescription').value = flowerData.family;
-        document.getElementById('updatedprice').value = flowerData.price;
-
-        if (flowerData.perennial) {
-            document.getElementById('updatedperennialOption').checked = true;
-        } else {
-            document.getElementById('updatedannualOption').checked = true;
-        }
-
-        const flowerTypeSelect = document.getElementById('updatedflowerType');
-        flowerTypeSelect.text = flowerData.type;
-
-        let color = [];
-        const colorOptions = document.querySelectorAll('[id^="updatedflowerColorOption"]');
-        colorOptions.forEach((option) => {
-            if (option.checked) {
-                color.push(option.value);
-            }
-        });
-        const colorString = color.join(',');
-
-        document.getElementById('updatedflowerPosition').value = flowerData.position;
-    }
-    document.getElementById("submitUpdatedFlower").addEventListener("click", function (event) {
-        saveFlower(flowerId);
-        event.preventDefault();
-    });
-}
-
-async function saveFlower(flowerId) {
+async function saveFlower() {
     const name = document.getElementById('flowerName').value;
     const latinName = document.getElementById('latinName').value;
     const family = document.getElementById('descriptionNew').value;
@@ -167,14 +109,9 @@ async function saveFlower(flowerId) {
     };
 
     try {
-        if (flowerId) {
-            console.log('saveFlower iškviesta id:', flowerId);
-            await axios.put(`${apiUrl}/${flowerId}`, flower);
-        } else {
-            await axios.post(apiUrl, flower);
-        }
-
-        window.location.href = "http://127.0.0.1:5500/homePage.html";
+        await axios.post(apiUrl, flower);
+        window.location.href = "http://127.0.0.1:5500/view/homePage.html";
+        showAlert(" išsaugota")
     } catch (error) {
         console.error('Error saving flower:', error);
     }
@@ -184,8 +121,8 @@ async function deleteFlower() {
     const flowerId = new URLSearchParams(window.location.search).get('id');
     try {
         await axios.delete(`${apiUrl}/${flowerId}`);
-        window.location.href = "http://127.0.0.1:5500/homePage.html";
-        alertMessage("Prekė ištrinta");
+        window.location.href = "http://127.0.0.1:5500/view/homePage.html";
+        showAlert(" ištrinta");
     } catch (error) {
         console.error('Error deleting author:', error);
     }
