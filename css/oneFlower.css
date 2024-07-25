@@ -21,3 +21,24 @@
     flex-direction: column;
     justify-content: center;
 }
+
+#updateFlower {
+    margin-left: 50px;
+}
+
+#menuSideBar {
+    margin-left: 50px;
+}
+
+#searchBar {
+    margin-top: 50px;
+    margin-left: 50px;
+}
+
+#header {
+    display: block;
+    font-size: 60px;
+    font-style: italic;
+    text-align: center;
+    height: 100px;
+}

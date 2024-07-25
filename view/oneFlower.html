@@ -10,16 +10,63 @@
 </head>
 
 <body>
-    <div class="container">
-        <div id="flower-info"></div>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script src="../js/main.js"></script>
-        <link rel="stylesheet" href="../css/oneFlower.css">
-
-        <script>
-            displayFlowerInfo();
-        </script>
+    <div id="header">Laumės darželis</div>
+    <div id="searchBar" class="row">
+        <div class="col-3">
+            <h5>Menu</h5>
+        </div>
+        <div class="col-6">
+        </div>
     </div>
+    <div class="row">
+        <div class="col-3">
+            <ul id="menuSideBar" class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">Vaiskrūmiai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Vaismedžiai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Vijokliniai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Dekoratyviniai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Spygliuočiai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Kambariniai augalai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Prieskoniai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Daržovių sėklos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Gėlių sėklos</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Grybai</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-9">
+            <div class="container">
+                <div id="flower-info"></div>
+                <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+                <script src="../js/main.js"></script>
+                <link rel="stylesheet" href="../css/oneFlower.css">
+
+                <script>
+                    displayFlowerInfo();
+                </script>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

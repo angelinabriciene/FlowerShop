@@ -96,9 +96,11 @@ async function displayFlowerInfo() {
                         <p>Kaina: ${flower.price} €</p>
                         <p>Aprašas: ${flower.family}</p>
                         <p>Spalva: ${flower.colorId}</p>
-                        <a href="./update.html?id=${flower.id}" class="btn btn-warning">Redaguoti</a>
-                        <button class="btn btn-danger" id="deleteFlower">Ištrinti</button>
                         </div>
+                    </div>
+                    <div>
+                    <a href="./update.html?id=${flower.id}" class="btn btn-warning" id="updateFlower">Redaguoti</a>
+                        <button class="btn btn-danger" id="deleteFlower">Ištrinti</button>
                     </div>
                     `;
 
