@@ -41,9 +41,24 @@
 }
 
 .pagination-button.active {
-    background-color: #007bff; 
-    color: #ffffff; 
+    background-color: #007bff;
+    color: #ffffff;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+#typeHeader > h2{
+    font-weight: lighter;
+    font-size: 20px;
+}
+
+#typeHeader {
+    font-weight: lighter;
+    font-size: 20px;
+}
+
+#allTypesHeader {
+    font-weight: lighter;
+    font-size: 20px;
 }

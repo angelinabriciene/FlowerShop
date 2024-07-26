@@ -16,14 +16,14 @@
 
 <body>
     <div id="homePage" class="container">
-        <div id="header">Laumės darželis</div>
         <div id="alert-message"></div>
+        <div id="header">Laumės darželis</div>
         <a id="createItem" href="./create.html">įkelti prekę</a>
         <div id="searchBar" class="row">
             <div class="col-3">
                 <h5>Menu</h5>
                 <div class="nav-item">
-                    <a class="nav-link" href="./homePage.html">Visi augalai</a>
+                    <a class="nav-link" href="./homePage.html"> ₰ Visi augalai</a>
                 </div>
             </div>
             <div class="col-6">
@@ -33,6 +33,14 @@
                     <span id="selectedType"></span>
                 </div>
             </div>
+            <div class="col-2">
+                <label for="filter">Rūšiuoti pagal:</label>
+                <select id="price" class="form-control">
+                    <option selected>A-Z</option>
+                    <option value="1">Nuo pigiausio</option>
+                    <option value="2">Nuo brangiausio</option>
+                </select>
+            </div>
         </div>
         <div class="row">
             <div class="col-3">
@@ -41,7 +49,8 @@
                     </ul>
                 </ul>
             </div>
-            <div class="col-9">        
+            <div class="col-9">
+                <div id="typeHeader"></div>        
                 <div id="flower-list">
                 </div>
                 <div id="pagination-buttons"></div>

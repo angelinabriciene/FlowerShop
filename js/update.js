@@ -1,20 +1,11 @@
 async function fetchFlowerData() {
-
-    console.log("fech flowerD pasiekta");
-
     const flowerId = new URLSearchParams(window.location.search).get('id');
-
-    console.log("fech id ", flowerId);
-
     try {
         
         const response = await axios.get(`http://localhost:8080/api/flowers/${flowerId}`);
         const flower = response.data;
 
         localStorage.setItem('flowerData', JSON.stringify(flower));
-
-        console.log(flower);
-
         fillForm(flowerId);
 
     } catch (error) {
@@ -24,13 +15,7 @@ async function fetchFlowerData() {
 
 function fillForm() {
     const flowerId = new URLSearchParams(window.location.search).get('id');
-
-    console.log("ID ", flowerId);
-
     const flowerData = localStorage.getItem('flowerData');
-
-    console.log("gele: ", flowerData);
-
     if (!flowerData) {
         console.error('No flower data found in local storage');
         return;
@@ -48,9 +33,8 @@ window.onload = async function () {
     fillForm();
 };
 
-
-
 function populateForm(flower) {
+    const flowerId = new URLSearchParams(window.location.search).get('id');
     document.getElementById('updatedflowerName').value = flower.name;
     document.getElementById('updatedplant').value = flower.plant;
     document.getElementById('updateddescription').value = flower.family;
@@ -62,7 +46,7 @@ function populateForm(flower) {
         document.getElementById('updatedannualOption').checked = true;
     }
 
-    document.getElementById("updatedflowerType").value = flower.typeId;
+    document.getElementById("updatedflowerType").value = flower.type.id;
 
     const colorCheckboxes = document.querySelectorAll('.form-check-input[type="checkbox"]');
     colorCheckboxes.forEach((checkbox) => {
@@ -79,6 +63,7 @@ function populateForm(flower) {
 }
 
 async function saveFlower() {
+    const apiUrl = 'http://localhost:8080/api/flowers';
     const flowerId = new URLSearchParams(window.location.search).get('id');
     const name = document.getElementById('updatedflowerName').value;
     const plant = document.getElementById('updatedplant').value;
@@ -115,10 +100,9 @@ async function saveFlower() {
     };
 
     try {
-            console.log('saveFlower iškviesta id:', flowerId);
             await axios.put(`${apiUrl}/${flowerId}`, flower);
-        
-        window.location.href = "http://127.0.0.1:5500/view/homePage.html";
+            window.location.href = "http://127.0.0.1:5500/view/homePage.html?info=u";
+            showAlert(" išsaugota")
     } catch (error) {
         console.error('Error saving flower:', error);
     }
