@@ -1,0 +1,23 @@
+#header {
+    display: block;
+    font-size: 60px;
+    font-style: italic;
+    text-align: center;
+    height: 100px;
+}
+
+#colorTable {
+    text-align: center;
+    margin-top: 20px;
+    display: flex;
+}
+
+#typeTable {
+    margin-top: 20px;
+    display: flex;
+}
+
+#positionTable {
+    margin-top: 20px;
+    display: flex;
+}

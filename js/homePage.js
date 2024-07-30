@@ -297,6 +297,7 @@ async function fetchFlowersFiltered(filterValue = '') {
 }
 
 const priceSelect = document.getElementById('price');
+
 priceSelect.addEventListener('change', async () => {
   const priceOption = priceSelect.options[priceSelect.selectedIndex].value;
   const flowers = await fetchFlowersByPrice(priceOption);

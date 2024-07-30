@@ -17,8 +17,12 @@
 <body>
     <div id="homePage" class="container">
         <div id="header">Laumės darželis</div>
-        <div id="alert-message"></div>
-        <a id="createItem" href="./create.html">įkelti prekę</a>
+        <div>
+            <a id="editOptions" href="./editOptions.html">redaguoti parinktis</a>
+        </div>
+        <div>
+            <a id="createItem" href="./create.html">įkelti prekę</a>
+        </div>
         <div id="searchBar" class="row">
             <div class="col-3">
                 <h5>Menu</h5>
@@ -31,6 +35,14 @@
                     <input type="text" id="filter" placeholder="Paieška">
                     <button class="btn btn-secondary" id="apply-filter">Ieškoti</button>
                 </div>
+            </div>
+            <div class="col-2">
+                <label for="filter">Rūšiuoti pagal:</label>
+                <select id="price" class="form-control">
+                    <option selected>A-Z</option>
+                    <option value="1">Nuo pigiausio</option>
+                    <option value="2">Nuo brangiausio</option>
+                </select>
             </div>
         </div>
         <div class="row">
