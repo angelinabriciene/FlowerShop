@@ -1,5 +1,3 @@
-const apiUrl = 'http://localhost:8080/api/flowers';
-
 let currentPage = 1;
 const itemsPerPage = 9;
 
@@ -83,16 +81,27 @@ async function fetchTypes() {
   try {
     const response = await axios.get("http://localhost:8080/api/types");
     const types = response.data;
+
+    // Ensure types is an array
+    if (!Array.isArray(types)) {
+      throw new Error('Invalid data format');
+    }
+
     const typeList = document.getElementById('menuSideBar');
     typeList.innerHTML = '';
 
+    // Loop through each type and create the list item
     types.forEach(type => {
-      const typeRow = `
-                <li class="nav-item">
-                    <a class="nav-link" href="oneType.html?id=${type.id}">₰ ${type.name}</a>
-                </li>
-            `;
-      typeList.insertAdjacentHTML('beforeend', typeRow);
+      if (type && type.id && type.name) {
+        const typeRow = `
+          <li class="nav-item">
+            <a class="nav-link" href="oneType.html?id=${type.id}">₰ ${type.name}</a>
+          </li>
+        `;
+        typeList.insertAdjacentHTML('beforeend', typeRow);
+      } else {
+        console.warn('Invalid type object:', type);
+      }
     });
   } catch (error) {
     console.error('Error fetching types:', error);

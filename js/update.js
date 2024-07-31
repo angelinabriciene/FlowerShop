@@ -1,12 +1,11 @@
 async function fetchFlowerData() {
     const flowerId = new URLSearchParams(window.location.search).get('id');
     try {
-        
         const response = await axios.get(`http://localhost:8080/api/flowers/${flowerId}`);
         const flower = response.data;
-
+console.log(flower);
         localStorage.setItem('flowerData', JSON.stringify(flower));
-        fillForm(flowerId);
+        fillForm();
 
     } catch (error) {
         console.error('Error fetching flower:', error);
@@ -14,7 +13,6 @@ async function fetchFlowerData() {
 }
 
 function fillForm() {
-    const flowerId = new URLSearchParams(window.location.search).get('id');
     const flowerData = localStorage.getItem('flowerData');
     if (!flowerData) {
         console.error('No flower data found in local storage');
@@ -24,17 +22,17 @@ function fillForm() {
     populateForm(flower);
 
     document.getElementById("submitUpdatedFlower").addEventListener("click", function (event) {
-        saveFlower(flowerId);
         event.preventDefault();
+        saveFlower();
     });
 }
+
 window.onload = async function () {
     await fetchFlowerData();
     fillForm();
 };
 
-function populateForm(flower) {
-    const flowerId = new URLSearchParams(window.location.search).get('id');
+async function populateForm(flower) {
     document.getElementById('updatedflowerName').value = flower.name;
     document.getElementById('updatedplant').value = flower.plant;
     document.getElementById('updateddescription').value = flower.family;
@@ -47,20 +45,45 @@ function populateForm(flower) {
     }
 
     document.getElementById("updatedflowerType").value = flower.type.id;
-
-    const colorCheckboxes = document.querySelectorAll('.form-check-input[type="checkbox"]');
-    colorCheckboxes.forEach((checkbox) => {
-        if (checkbox.value === flower.colorId.toString()) {
-            checkbox.checked = true;
-        }
-    });
     document.getElementById("updatedflowerPosition").value = flower.plantingPositionId;
 
-    document.getElementById("submitUpdatedFlower").addEventListener("click", function (event) {
-        saveFlower(flowerId);
-        event.preventDefault();
-    });
+    try {
+        const colorsResponse = await axios.get('http://localhost:8080/api/colors');
+        const colors = colorsResponse.data;
+
+        console.log('Fetched colors:', colors);
+
+        const colorsContainer = document.getElementById('colorsContainer');
+        colorsContainer.innerHTML = '';
+
+        colors.forEach(color => {
+
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = `colorOption${color.id}`;
+            checkbox.value = color.id;
+            checkbox.className = 'form-check-input';
+            console.log(flower.colors);
+            if (flower.colors && flower.colors.some(flowerColor => flowerColor.id === color.id)) {
+                checkbox.checked = true;
+
+                console.log(`Creating checkbox for color ID ${color.id}`);
+            }
+
+            const label = document.createElement('label');
+            label.htmlFor = checkbox.id;
+            label.textContent = color.name;
+
+            colorsContainer.appendChild(checkbox);
+            colorsContainer.appendChild(label);
+            colorsContainer.appendChild(document.createElement('br'));
+
+        });
+    } catch (error) {
+        console.error('Error fetching colors:', error);
+    }
 }
+
 
 async function saveFlower() {
     const apiUrl = 'http://localhost:8080/api/flowers';
@@ -69,24 +92,14 @@ async function saveFlower() {
     const plant = document.getElementById('updatedplant').value;
     const family = document.getElementById('updateddescription').value;
     const price = document.getElementById('updatedprice').value;
-    let perennial;
-    const perennialRadios = document.getElementsByName('exampleRadios');
-    for (let i = 0; i < perennialRadios.length; i++) {
-        if (perennialRadios[i].checked) {
-            perennial = perennialRadios[i].value;
-            break;
-        }
-    }
-    const type = document.getElementById('updatedflowerType').value;
-    let color = [];
-    const colorOptions = document.querySelectorAll('[id^="flowerColorOption"]');
-    colorOptions.forEach((option) => {
-        if (option.checked) {
-            color.push(option.value);
-        }
-    });
-    const colorString = color.join(',');
+    const perennial = document.querySelector('input[name="exampleRadios"]:checked').value;
+    const typeId = document.getElementById('updatedflowerType').value;
     const plantingPositionId = document.getElementById('updatedflowerPosition').value;
+
+    const colorIds = [];
+    document.querySelectorAll('.form-check-input[type="checkbox"]:checked').forEach(checkbox => {
+        colorIds.push(Number(checkbox.value));
+    });
 
     const flower = {
         name,
@@ -94,15 +107,14 @@ async function saveFlower() {
         family,
         price,
         perennial,
-        typeId: type,
-        colorId: color.length > 0 ? color[0] : null,
+        type: { id: Number(typeId) },
+        colorIds,
         plantingPositionId
     };
 
     try {
-            await axios.put(`${apiUrl}/${flowerId}`, flower);
-            window.location.href = "http://127.0.0.1:5500/view/homePage.html?info=u";
-            showAlert(" išsaugota")
+        await axios.put(`${apiUrl}/${flowerId}`, flower);
+        window.location.href = "http://127.0.0.1:5500/view/homePage.html?info=u";
     } catch (error) {
         console.error('Error saving flower:', error);
     }
