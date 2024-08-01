@@ -1,9 +1,13 @@
+window.onload = async function () {
+    await fetchFlowerData();
+    fillForm();
+};
+
 async function fetchFlowerData() {
     const flowerId = new URLSearchParams(window.location.search).get('id');
     try {
         const response = await axios.get(`http://localhost:8080/api/flowers/${flowerId}`);
         const flower = response.data;
-console.log(flower);
         localStorage.setItem('flowerData', JSON.stringify(flower));
         fillForm();
 
@@ -27,11 +31,6 @@ function fillForm() {
     });
 }
 
-window.onload = async function () {
-    await fetchFlowerData();
-    fillForm();
-};
-
 async function populateForm(flower) {
     document.getElementById('updatedflowerName').value = flower.name;
     document.getElementById('updatedplant').value = flower.plant;
@@ -51,8 +50,6 @@ async function populateForm(flower) {
         const colorsResponse = await axios.get('http://localhost:8080/api/colors');
         const colors = colorsResponse.data;
 
-        console.log('Fetched colors:', colors);
-
         const colorsContainer = document.getElementById('colorsContainer');
         colorsContainer.innerHTML = '';
 
@@ -63,11 +60,8 @@ async function populateForm(flower) {
             checkbox.id = `colorOption${color.id}`;
             checkbox.value = color.id;
             checkbox.className = 'form-check-input';
-            console.log(flower.colors);
             if (flower.colors && flower.colors.some(flowerColor => flowerColor.id === color.id)) {
                 checkbox.checked = true;
-
-                console.log(`Creating checkbox for color ID ${color.id}`);
             }
 
             const label = document.createElement('label');
@@ -83,7 +77,6 @@ async function populateForm(flower) {
         console.error('Error fetching colors:', error);
     }
 }
-
 
 async function saveFlower() {
     const apiUrl = 'http://localhost:8080/api/flowers';

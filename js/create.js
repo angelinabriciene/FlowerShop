@@ -7,12 +7,14 @@ try {
     });
 } catch (Exception) { }
 
+window.onload = function () {
+    populateColors();
+};
+
 async function populateColors() {
     try {
         const colorsResponse = await axios.get('http://localhost:8080/api/colors');
         const colors = colorsResponse.data;
-
-        console.log('Fetched colors:', colors);
 
         const colorsContainer = document.getElementById('colorsContainer');
         colorsContainer.innerHTML = '';
@@ -62,9 +64,7 @@ async function saveFlower() {
         colorIds,
         plantingPositionId
     };
-
-    console.log('Flower data to save:', flower);
-
+    
     try {
         await axios.post(apiUrl, flower);
         window.location.href = "http://127.0.0.1:5500/view/homePage.html?info=u";
@@ -73,7 +73,3 @@ async function saveFlower() {
         console.error('Error saving flower:', error);
     }
 }
-
-window.onload = function () {
-    populateColors();
-};

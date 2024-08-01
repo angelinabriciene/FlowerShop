@@ -1,75 +1,8 @@
 let currentPage = 1;
 const itemsPerPage = 9;
-
-fetchFlowers();
-fetchTypes();
-
-const filterInput = document.getElementById('filter');
-const applyFilterButton = document.getElementById('apply-filter');
-
-applyFilterButton.addEventListener('click', applyFilter);
-
-async function fetchFlowers() {
-  const typeId = new URLSearchParams(window.location.search).get('id');
-  try {
-    const response = await axios.get(`http://localhost:8080/api/types/${typeId}`);
-    const type = response.data;
-    const flowers = type.flowers;
-
-    const totalItemCount = flowers.length;
-    const typeHeader = document.getElementById('typeHeader');
-    typeHeader.innerHTML = `<h2>${type.name} (${totalItemCount})</h2>`;
-
-    const flowerList = document.getElementById('flower-list');
-    flowerList.innerHTML = '';
-
-    const paginatedFlowers = paginate(flowers, currentPage, itemsPerPage);
-
-    paginatedFlowers.forEach(flower => {
-      const flowerRow = `
-            <a href="oneFlower.html?id=${flower.id}">
-                <div class="card" style="width: 18rem;">
-                    <img class="card-img-top" src="green.jpg" alt="Card image cap">
-                     <div class="card-body">
-                     <p id="flowerName" class="card-text">${flower.name}</p>
-                     <p id="flowerName" class="card-text">${flower.plant}</p>
-                    <p id="flowerPrice" class="card-text"> Kaina: ${flower.price} €</p>
-                </div>
-            </div>
-        </a>
-     `;
-      flowerList.insertAdjacentHTML('beforeend', flowerRow);
-    });
-
-    const paginationButtons = document.getElementById('pagination-buttons');
-    paginationButtons.innerHTML = '';
-
-    const totalPages = Math.ceil(flowers.length / itemsPerPage);
-
-    for (let i = 1; i <= totalPages; i++) {
-      const button = document.createElement('button');
-      button.textContent = i;
-      button.className = 'pagination-button';
-
-      if (i == currentPage) {
-        button.classList.add('active');
-      }
-
-      button.addEventListener('click', () => {
-        currentPage = i;
-        fetchFlowers();
-      });
-      paginationButtons.appendChild(button);
-    }
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-
-  } catch (error) {
-    console.error('Error fetching flowers:', error);
-  }
-}
+let allFlowers = [];
+let filterValue = '';
+let priceOption = '';
 
 function paginate(array, page, itemsPerPage) {
   const startIndex = (page - 1) * itemsPerPage;
@@ -77,12 +10,32 @@ function paginate(array, page, itemsPerPage) {
   return array.slice(startIndex, endIndex);
 }
 
+async function fetchFlowers() {
+  const typeId = new URLSearchParams(window.location.search).get('id');
+  try {
+    const response = await axios.get(`http://localhost:8080/api/types/${typeId}`);
+    const type = response.data;
+    const flowers = type.flowers || [];
+
+    const validFlowers = flowers.filter(flower => flower && typeof flower === 'object' && flower.id);
+    
+    const totalItemCount = validFlowers.length;
+    const typeHeader = document.getElementById('typeHeader');
+    typeHeader.innerHTML = `<h2>${type.name} (${totalItemCount})</h2>`;
+
+    allFlowers = validFlowers;
+
+    applyFilters();
+  } catch (error) {
+    console.error('Error fetching flowers:', error);
+  }
+}
+
 async function fetchTypes() {
   try {
     const response = await axios.get("http://localhost:8080/api/types");
     const types = response.data;
 
-    // Ensure types is an array
     if (!Array.isArray(types)) {
       throw new Error('Invalid data format');
     }
@@ -90,12 +43,11 @@ async function fetchTypes() {
     const typeList = document.getElementById('menuSideBar');
     typeList.innerHTML = '';
 
-    // Loop through each type and create the list item
     types.forEach(type => {
       if (type && type.id && type.name) {
         const typeRow = `
           <li class="nav-item">
-            <a class="nav-link" href="oneType.html?id=${type.id}">₰ ${type.name}</a>
+            <a class="nav-link" href="oneType.html?id=${type.id}" data-type="${type.id}">₰ ${type.name}</a>
           </li>
         `;
         typeList.insertAdjacentHTML('beforeend', typeRow);
@@ -103,139 +55,94 @@ async function fetchTypes() {
         console.warn('Invalid type object:', type);
       }
     });
+
   } catch (error) {
     console.error('Error fetching types:', error);
   }
 }
 
-async function applyFilter() {
-  const filterValue = filterInput.value.trim().toLowerCase();
+function applyFilters() {
+  let filteredFlowers = allFlowers;
+
+  if (filterValue) {
+    filteredFlowers = filteredFlowers.filter(flower =>
+      flower.name.toLowerCase().includes(filterValue.toLowerCase()) ||
+      flower.plant.toLowerCase().includes(filterValue.toLowerCase())
+    );
+  }
+
+  if (priceOption) {
+    if (priceOption === '1') {
+      filteredFlowers.sort((a, b) => a.price - b.price);
+    } else if (priceOption === '2') {
+      filteredFlowers.sort((a, b) => b.price - a.price);
+    }
+  }
+
+  displayFlowers(filteredFlowers);
+}
+
+function displayFlowers(flowers) {
   const flowerList = document.getElementById('flower-list');
   flowerList.innerHTML = '';
 
-  try {
-    const flowers = await fetchFlowersFiltered(filterValue);
-    if (flowers.length === 0) {
-      document.getElementById('flower-list').innerHTML = 'No flowers found.';
-    } else {
-      const paginatedFlowers = paginate(flowers, currentPage, itemsPerPage);
-
-      paginatedFlowers.forEach(flower => {
-        const flowerRow = `
-            <a href="oneFlower.html?id=${flower.id}">
-              <div class="card" style="width: 18rem;">
-                <img class="card-img-top" src="green.jpg" alt="Card image cap">
-                <div class="card-body">
-                  <p id="flowerName" class="card-text">${flower.name}</p>
-                  <p id="flowerName" class="card-text">${flower.plant}</p>
-                  <p id="flowerPrice" class="card-text"> Kaina: ${flower.price} €</p>
-                </div>
-              </div>
-            </a>
-          `;
-        flowerList.insertAdjacentHTML('beforeend', flowerRow);
-      });
-
-      const paginationButtons = document.getElementById('pagination-buttons');
-      paginationButtons.innerHTML = '';
-
-      const totalPages = Math.ceil(flowers.length / itemsPerPage);
-
-      for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement('button');
-        button.textContent = i;
-        button.className = 'pagination-button';
-
-        if (i == currentPage) {
-          button.classList.add('active');
-        }
-
-        button.addEventListener('click', () => {
-          currentPage = i;
-          applyFilter();
-        });
-        paginationButtons.appendChild(button);
-      }
-    }
-  } catch (error) {
-    console.error('Error fetching flowers:', error);
-    document.getElementById('flower-list').innerHTML = 'Failed to fetch flowers. Please try again later.';
-  }
-}
-
-async function fetchFlowersFiltered(filterValue = '') {
-  try {
-    const response = await axios.get(`http://localhost:8080/api/types`);
-    const types = response.data;
-
-    if (response.status === 200) {
-      const flowers = types.flatMap(type => type.flowers.filter(flower => {
-        return (
-          flower.name.toLowerCase().includes(filterValue.toLowerCase()) ||
-          flower.plant.toLowerCase().includes(filterValue.toLowerCase())
-        );
-      }));
-      return flowers;
-    } else {
-      console.error('Error fetching flowers:', response.status);
-      return [];
-    }
-  } catch (error) {
-    console.error('Error fetching flowers:', error);
-    return [];
-  }
-}
-
-const priceSelect = document.getElementById('price');
-
-priceSelect.addEventListener('change', async () => {
-  const priceOption = priceSelect.options[priceSelect.selectedIndex].value;
-  const flowers = await fetchFlowersByPrice(priceOption);
-  const flowerList = document.getElementById('flower-list');
-  flowerList.innerHTML = '';
   const paginatedFlowers = paginate(flowers, currentPage, itemsPerPage);
 
-  let cardCount = 0;
-
   paginatedFlowers.forEach(flower => {
-    const flowerRow = `
-      <a href="oneFlower.html?id=${flower.id}">
-        <div class="card" style="width: 18rem;">
-          <img class="card-img-top" src="green.jpg" alt="Card image cap">
-          <div class="card-body">
-            <p id="flowerName" class="card-text">${flower.name}</p>
-            <p id="flowerPlant" class="card-text">${flower.plant}</p>
-            <p id="flowerPrice" class="card-text"> Kaina: ${flower.price} €</p>
+    if (flower && flower.id) {
+      const flowerRow = `
+        <a href="oneFlower.html?id=${flower.id}">
+          <div class="card" style="width: 18rem;">
+            <img class="card-img-top" src="green.jpg" alt="Card image cap">
+            <div class="card-body">
+              <p class="card-text">${flower.name}</p>
+              <p class="card-text">${flower.plant}</p>
+              <p class="card-text">Kaina: ${flower.price} €</p>
+            </div>
           </div>
-        </div>
-      </a>
-    `;
-    flowerList.insertAdjacentHTML('beforeend', flowerRow);
-    cardCount++;
+        </a>
+      `;
+      flowerList.insertAdjacentHTML('beforeend', flowerRow);
+    } else {
+      console.warn('Invalid flower object:', flower);
+    }
   });
+
+  const paginationButtons = document.getElementById('pagination-buttons');
+  paginationButtons.innerHTML = '';
+
+  const totalPages = Math.ceil(flowers.length / itemsPerPage);
+
+  for (let i = 1; i <= totalPages; i++) {
+    const button = document.createElement('button');
+    button.textContent = i;
+    button.className = 'pagination-button';
+
+    if (i === currentPage) {
+      button.classList.add('active');
+    }
+
+    button.addEventListener('click', () => {
+      currentPage = i;
+      applyFilters();
+    });
+    paginationButtons.appendChild(button);
+  }
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+document.getElementById('filter').addEventListener('input', (event) => {
+  filterValue = event.target.value.trim().toLowerCase();
+  applyFilters();
 });
 
-async function fetchFlowersByPrice(priceOption = '') {
-  try {
-    const response = await axios.get(`http://localhost:8080/api/types`);
-    const types = response.data;
+document.getElementById('price').addEventListener('change', (event) => {
+  priceOption = event.target.value;
+  applyFilters();
+});
 
-    if (response.status === 200) {
-      let flowers = types.flatMap(type => type.flowers);
-
-      if (priceOption === '1') {
-        flowers.sort((a, b) => a.price - b.price);
-      } else if (priceOption === '2') {
-        flowers.sort((a, b) => b.price - a.price);
-      }
-
-      return flowers;
-    } else {
-      console.error('Error fetching flowers:', response.status);
-      return [];
-    }
-  } catch (error) {
-    console.error('Error fetching flowers:', error);
-    return [];
-  }
-}
+fetchTypes();
+fetchFlowers();

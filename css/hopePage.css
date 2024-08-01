@@ -20,8 +20,8 @@
     display: inline-block;
 }
 
-#flowerName {
-    color: brown;
+.card-text {
+    color: rgb(182, 104, 104);
     font-weight: bold;
 }
 
