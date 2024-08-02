@@ -9,6 +9,7 @@ try {
 
 window.onload = function () {
     populateColors();
+    populateTypes();
 };
 
 async function populateColors() {
@@ -37,6 +38,25 @@ async function populateColors() {
         });
     } catch (error) {
         console.error('Error fetching colors:', error);
+    }
+}
+
+async function populateTypes() {
+    try {
+        const typesResponse = await axios.get('http://localhost:8080/api/types');
+        const types = typesResponse.data;
+
+        const flowerTypeSelect = document.getElementById('flowerType');
+        flowerTypeSelect.innerHTML = '<option selected>Augalo tipas</option>';
+
+        types.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.id;
+            option.textContent = type.name;
+            flowerTypeSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error fetching types:', error);
     }
 }
 

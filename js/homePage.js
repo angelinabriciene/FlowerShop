@@ -21,7 +21,7 @@ let currentType = '';
 let filterValue = '';
 let priceOption = '';
 let currentPage = 1;
-const itemsPerPage = 9;
+const itemsPerPage = 6;
 
 function showAlert(status) {
   const alertsContainer = document.getElementById('alert-message');
