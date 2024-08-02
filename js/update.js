@@ -43,7 +43,38 @@ async function populateForm(flower) {
         document.getElementById('updatedannualOption').checked = true;
     }
 
-    document.getElementById("updatedflowerType").value = flower.type.id;
+    try {
+        const typesResponse = await axios.get('http://localhost:8080/api/types');
+        const types = typesResponse.data;
+    
+        const typesContainer = document.getElementById('typesContainer');
+        typesContainer.innerHTML = '';
+    
+        const selectElement = document.createElement('select');
+        selectElement.id = 'updatedflowerType';
+        selectElement.className = 'form-control';
+        typesContainer.appendChild(selectElement);
+    
+        const defaultOption = document.createElement('option');
+        defaultOption.selected = true;
+        defaultOption.disabled = true;
+        defaultOption.textContent = flower.type.name;
+        selectElement.appendChild(defaultOption);
+    
+        types.forEach(type => {
+            const option = document.createElement('option');
+            option.value = type.id;
+            option.textContent = type.name;
+            if (type.id === flower.type.id) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        });
+    
+    } catch (error) {
+        console.error('Error fetching types:', error);
+    }
+
     document.getElementById("updatedflowerPosition").value = flower.plantingPositionId;
 
     try {
@@ -86,7 +117,7 @@ async function saveFlower() {
     const family = document.getElementById('updateddescription').value;
     const price = document.getElementById('updatedprice').value;
     const perennial = document.querySelector('input[name="exampleRadios"]:checked').value;
-    const typeId = document.getElementById('updatedflowerType').value;
+    const typeId = Number(document.getElementById('updatedflowerType').value);
     const plantingPositionId = document.getElementById('updatedflowerPosition').value;
 
     const colorIds = [];
@@ -100,7 +131,7 @@ async function saveFlower() {
         family,
         price,
         perennial,
-        type: { id: Number(typeId) },
+        type: { id: typeId },
         colorIds,
         plantingPositionId
     };

@@ -12,7 +12,27 @@ document.getElementById('createType').addEventListener('click', function () {
         saveButton.innerText = 'Išsaugoti';
         saveButton.addEventListener('click', createType);
 
-        const inputContainer = document.getElementById('inputContainer');
+        const inputContainer = document.getElementById('typeInputContainer');
+        inputContainer.appendChild(inputField);
+        inputContainer.appendChild(saveButton);
+    }
+});
+
+document.getElementById('createColor').addEventListener('click', function () {
+    if (!document.getElementById('newColorInput')) {
+        const inputField = document.createElement('input');
+        inputField.color = 'text';
+        inputField.id = 'newColorInput';
+        inputField.className = 'form-control';
+        inputField.placeholder = 'Įveskite naują spalvą';
+
+        const saveButton = document.createElement('button');
+        saveButton.color = 'button';
+        saveButton.className = 'btn btn-outline-success';
+        saveButton.innerText = 'Išsaugoti';
+        saveButton.addEventListener('click', createColor);
+
+        const inputContainer = document.getElementById('colorInputContainer');
         inputContainer.appendChild(inputField);
         inputContainer.appendChild(saveButton);
     }
@@ -21,6 +41,13 @@ document.getElementById('createType').addEventListener('click', function () {
 try {
     document.getElementById("submitNewType").addEventListener("click", function (event) {
         saveType();
+        event.preventDefault();
+    });
+} catch (Exception) { }
+
+try {
+    document.getElementById("submitNewColor").addEventListener("click", function (event) {
+        saveColor();
         event.preventDefault();
     });
 } catch (Exception) { }
@@ -55,7 +82,7 @@ async function fetchTypes() {
             </td>
             <td>
                 <button type="button" class="btn btn-outline-warning" data-id="${type.id}">Redaguoti</button>
-                <button type="button" class="btn btn-outline-danger" data-id="${type.id}">Ištrinti</button>
+                <button type="button" class="btn btn-outline-danger type-delete" data-id="${type.id}">Ištrinti</button>
             </td>
         </tr>
     `;
@@ -81,14 +108,14 @@ async function fetchTypes() {
 
                     saveButton.addEventListener('click', () => updateType(typeId));
 
-                    const inputContainer = document.getElementById('inputContainer');
+                    const inputContainer = document.getElementById('typeInputContainer');
                     inputContainer.appendChild(inputField);
                     inputContainer.appendChild(saveButton);
                 }
             });
         });
 
-        document.querySelectorAll('.btn-outline-danger').forEach(button => {
+        document.querySelectorAll('.type-delete').forEach(button => {
             button.addEventListener('click', async function () {
                 const typeId = this.getAttribute('data-id');
                 await deleteType(typeId);
@@ -114,13 +141,47 @@ async function fetchColors() {
                 <a href="oneColor.html?id=${color.id}">${color.name}</a>
             </td>
             <td>
-                <button type="button" class="btn btn-outline-warning">Redaguoti</button>
-                <button type="button" class="btn btn-outline-danger">Ištrinti</button>
+                <button type="button" class="btn btn-outline-warning" data-id="${color.id}">Redaguoti</button>
+                <button type="button" class="btn btn-outline-danger color-delete" data-id="${color.id}">Ištrinti</button>
             </td>
         </tr>
     `;
             colorList.insertAdjacentHTML('beforeend', colorRow);
         });
+
+        document.querySelectorAll('.btn-outline-warning').forEach(button => {
+            button.addEventListener('click', async function () {
+                const colorId = this.getAttribute('data-id');
+                const color = colors.find(t => t.id === parseInt(colorId));
+
+                if (!document.getElementById('newColorInput')) {
+                    const inputField = document.createElement('input');
+                    inputField.type = 'text';
+                    inputField.id = 'editColorInput';
+                    inputField.className = 'form-control';
+                    inputField.placeholder = color.name;
+
+                    const saveButton = document.createElement('button');
+                    saveButton.type = 'button';
+                    saveButton.className = 'btn btn-outline-success';
+                    saveButton.innerText = 'Išsaugoti';
+
+                    saveButton.addEventListener('click', () => updateColor(colorId));
+
+                    const inputContainer = document.getElementById('colorInputContainer');
+                    inputContainer.appendChild(inputField);
+                    inputContainer.appendChild(saveButton);
+                }
+            });
+        });
+
+        document.querySelectorAll('.color-delete').forEach(button => {
+            button.addEventListener('click', async function () {
+                const colorId = this.getAttribute('data-id');
+                await deleteColor(colorId);
+            });
+        });
+
     } catch (error) {
         console.error('Error fetching types:', error);
     }
@@ -167,7 +228,7 @@ async function createType() {
             behavior: 'smooth'
         });
         showAlert("Naujas tipas išsaugotas");
-        const inputContainer = document.getElementById('inputContainer');
+        const inputContainer = document.getElementById('typeInputContainer');
         inputContainer.innerHTML = '';
     } catch (error) {
         console.error('Error saving flower:', error);
@@ -184,7 +245,7 @@ async function deleteType(typeId) {
         });
         showAlert("Tipas ištrintas");
     } catch (error) {
-        console.error('Error deleting author:', error);
+        console.error('Error deleting color:', error);
 
         if (error.response) {
             if (error.response.status === 409) {
@@ -225,9 +286,81 @@ async function updateType(typeId) {
             behavior: 'smooth'
         });
         showAlert("Tipas redaguotas");
-        const inputContainer = document.getElementById('inputContainer');
+        const inputContainer = document.getElementById('typeInputContainer');
         inputContainer.innerHTML = '';
     } catch (error) {
         console.error('Error updating type:', error);
+    }
+}
+
+async function createColor() {
+    const name = document.getElementById('newColorInput').value;
+
+    const color = {
+        name
+    };
+
+    try {
+        await axios.post('http://localhost:8080/api/colors', color);
+        fetchColors();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        showAlert("Nauja spalva išsaugota");
+        const inputContainer = document.getElementById('colorInputContainer');
+        inputContainer.innerHTML = '';
+    } catch (error) {
+        console.error('Error saving flower:', error);
+    }
+}
+
+async function deleteColor(colorId) {
+    try {
+        await axios.delete(`${'http://localhost:8080/api/colors'}/${colorId}`);
+        fetchColors();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        showAlert("Spalva ištrinta");
+    } catch (error) {
+        console.error('Error deleting color:', error);
+
+        if (error.response && error.response.status === 409) {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            showAlert("Negalima ištrinti spalvos, nes ji turi susijusių gėlių.");
+        } else {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            showAlert("Įvyko klaida, bandykite dar kartą.");
+        }
+    }
+}
+
+async function updateColor(colorId) {
+    const apiUrl = 'http://localhost:8080/api/colors';
+    const name = document.getElementById('editColorInput').value;
+    try {
+        await axios.put(`${apiUrl}/${colorId}`, { name: name }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        fetchColors();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        showAlert("Spalva redaguota");
+        const inputContainer = document.getElementById('colorInputContainer');
+        inputContainer.innerHTML = '';
+    } catch (error) {
+        console.error('Error updating color:', error);
     }
 }
