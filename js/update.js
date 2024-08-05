@@ -29,6 +29,7 @@ function fillForm() {
         event.preventDefault();
         saveFlower();
     });
+    console.log(flower);
 }
 
 async function populateForm(flower) {
@@ -46,21 +47,21 @@ async function populateForm(flower) {
     try {
         const typesResponse = await axios.get('http://localhost:8080/api/types');
         const types = typesResponse.data;
-    
+
         const typesContainer = document.getElementById('typesContainer');
         typesContainer.innerHTML = '';
-    
+
         const selectElement = document.createElement('select');
         selectElement.id = 'updatedflowerType';
         selectElement.className = 'form-control';
         typesContainer.appendChild(selectElement);
-    
+
         const defaultOption = document.createElement('option');
         defaultOption.selected = true;
         defaultOption.disabled = true;
         defaultOption.textContent = flower.type.name;
         selectElement.appendChild(defaultOption);
-    
+
         types.forEach(type => {
             const option = document.createElement('option');
             option.value = type.id;
@@ -70,12 +71,42 @@ async function populateForm(flower) {
             }
             selectElement.appendChild(option);
         });
-    
+
     } catch (error) {
         console.error('Error fetching types:', error);
     }
 
-    document.getElementById("updatedflowerPosition").value = flower.plantingPositionId;
+    try {
+        const positionsResponse = await axios.get('http://localhost:8080/api/planting_positions');
+        const positions = positionsResponse.data;
+
+        const positionsContainer = document.getElementById('positionsContainer');
+        positionsContainer.innerHTML = '';
+
+        const selectElement = document.createElement('select');
+        selectElement.id = 'updatedflowerPosition';
+        selectElement.className = 'form-control';
+        positionsContainer.appendChild(selectElement);
+
+        const defaultOption = document.createElement('option');
+        defaultOption.selected = true;
+        defaultOption.disabled = true;
+        defaultOption.textContent = flower.position;
+        selectElement.appendChild(defaultOption);
+
+        positions.forEach(position => {
+            const option = document.createElement('option');
+            option.value = position.id;
+            option.textContent = position.name;
+            if (position.id === flower.plantingPositionId) {
+                option.selected = true;
+            }
+            selectElement.appendChild(option);
+        });
+
+    } catch (error) {
+        console.error('Error fetching positions:', error);
+    }
 
     try {
         const colorsResponse = await axios.get('http://localhost:8080/api/colors');

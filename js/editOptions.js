@@ -21,7 +21,7 @@ document.getElementById('createType').addEventListener('click', function () {
 document.getElementById('createColor').addEventListener('click', function () {
     if (!document.getElementById('newColorInput')) {
         const inputField = document.createElement('input');
-        inputField.color = 'text';
+        inputField.type = 'text';
         inputField.id = 'newColorInput';
         inputField.className = 'form-control';
         inputField.placeholder = 'Įveskite naują spalvą';
@@ -38,6 +38,26 @@ document.getElementById('createColor').addEventListener('click', function () {
     }
 });
 
+document.getElementById('createPosition').addEventListener('click', function () {
+    if (!document.getElementById('newPositionInput')) {
+        const inputField = document.createElement('input');
+        inputField.type = 'text';
+        inputField.id = 'newPositionInput';
+        inputField.className = 'form-control';
+        inputField.placeholder = 'Įveskite naują vietą';
+
+        const saveButton = document.createElement('button');
+        saveButton.type = 'button';
+        saveButton.className = 'btn btn-outline-success';
+        saveButton.innerText = 'Išsaugoti';
+        saveButton.addEventListener('click', createPosition);
+
+        const inputContainer = document.getElementById('positionInputContainer');
+        inputContainer.appendChild(inputField);
+        inputContainer.appendChild(saveButton);
+    }
+});
+
 try {
     document.getElementById("submitNewType").addEventListener("click", function (event) {
         saveType();
@@ -48,6 +68,13 @@ try {
 try {
     document.getElementById("submitNewColor").addEventListener("click", function (event) {
         saveColor();
+        event.preventDefault();
+    });
+} catch (Exception) { }
+
+try {
+    document.getElementById("submitNewPosition").addEventListener("click", function (event) {
+        savePosition();
         event.preventDefault();
     });
 } catch (Exception) { }
@@ -81,7 +108,7 @@ async function fetchTypes() {
                 <a href="oneType.html?id=${type.id}">${type.name}</a>
             </td>
             <td>
-                <button type="button" class="btn btn-outline-warning" data-id="${type.id}">Redaguoti</button>
+                <button type="button" class="btn btn-outline-warning type-update" data-id="${type.id}">Redaguoti</button>
                 <button type="button" class="btn btn-outline-danger type-delete" data-id="${type.id}">Ištrinti</button>
             </td>
         </tr>
@@ -89,7 +116,7 @@ async function fetchTypes() {
             typeList.insertAdjacentHTML('beforeend', typeRow);
         });
 
-        document.querySelectorAll('.btn-outline-warning').forEach(button => {
+        document.querySelectorAll('.type-update').forEach(button => {
             button.addEventListener('click', async function () {
                 const typeId = this.getAttribute('data-id');
                 const type = types.find(t => t.id === parseInt(typeId));
@@ -141,7 +168,7 @@ async function fetchColors() {
                 <a href="oneColor.html?id=${color.id}">${color.name}</a>
             </td>
             <td>
-                <button type="button" class="btn btn-outline-warning" data-id="${color.id}">Redaguoti</button>
+                <button type="button" class="btn btn-outline-warning color-update" data-id="${color.id}">Redaguoti</button>
                 <button type="button" class="btn btn-outline-danger color-delete" data-id="${color.id}">Ištrinti</button>
             </td>
         </tr>
@@ -149,7 +176,7 @@ async function fetchColors() {
             colorList.insertAdjacentHTML('beforeend', colorRow);
         });
 
-        document.querySelectorAll('.btn-outline-warning').forEach(button => {
+        document.querySelectorAll('.color-update').forEach(button => {
             button.addEventListener('click', async function () {
                 const colorId = this.getAttribute('data-id');
                 const color = colors.find(t => t.id === parseInt(colorId));
@@ -201,13 +228,47 @@ async function fetchPositions() {
                 <a href="onePosition.html?id=${position.id}">${position.name}</a>
             </td>
             <td>
-                <button type="button" class="btn btn-outline-warning">Redaguoti</button>
-                <button type="button" class="btn btn-outline-danger">Ištrinti</button>
+                <button type="button" class="btn btn-outline-warning position-update" data-id="${position.id}">Redaguoti</button>
+                <button type="button" class="btn btn-outline-danger position-delete" data-id="${position.id}">Ištrinti</button>
             </td>
         </tr>
     `;
             positionList.insertAdjacentHTML('beforeend', positionRow);
         });
+
+        document.querySelectorAll('.position-update').forEach(button => {
+            button.addEventListener('click', async function () {
+                const positionId = this.getAttribute('data-id');
+                const position = positions.find(t => t.id === parseInt(positionId));
+
+                if (!document.getElementById('newPositionInput')) {
+                    const inputField = document.createElement('input');
+                    inputField.type = 'text';
+                    inputField.id = 'editPositionInput';
+                    inputField.className = 'form-control';
+                    inputField.placeholder = position.name;
+
+                    const saveButton = document.createElement('button');
+                    saveButton.type = 'button';
+                    saveButton.className = 'btn btn-outline-success';
+                    saveButton.innerText = 'Išsaugoti';
+
+                    saveButton.addEventListener('click', () => updatePosition(positionId));
+
+                    const inputContainer = document.getElementById('positionInputContainer');
+                    inputContainer.appendChild(inputField);
+                    inputContainer.appendChild(saveButton);
+                }
+            });
+        });
+
+        document.querySelectorAll('.position-delete').forEach(button => {
+            button.addEventListener('click', async function () {
+                const positionId = this.getAttribute('data-id');
+                await deletePosition(positionId);
+            });
+        });
+
     } catch (error) {
         console.error('Error fetching types:', error);
     }
@@ -362,5 +423,79 @@ async function updateColor(colorId) {
         inputContainer.innerHTML = '';
     } catch (error) {
         console.error('Error updating color:', error);
+    }
+}
+
+async function createPosition() {
+    const name = document.getElementById('newPositionInput').value;
+
+    const position = {
+        name
+    };
+
+    try {
+        await axios.post('http://localhost:8080/api/planting_positions', position);
+        fetchPositions();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        showAlert("Nauja sodinimo vieta išsaugota");
+        const inputContainer = document.getElementById('positionInputContainer');
+        inputContainer.innerHTML = '';
+    } catch (error) {
+        console.error('Error saving position:', error);
+    }
+}
+
+async function deletePosition(positionId) {
+    console.log(positionId);
+
+    try {
+        await axios.delete(`${'http://localhost:8080/api/planting_positions'}/${positionId}`);
+        fetchPositions();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        showAlert("Sodinimo vieta ištrinta");
+    } catch (error) {
+        console.error('Error deleting position:', error);
+
+        if (error.response && error.response.status === 409) {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            showAlert("Negalima ištrinti sodinimo vietos, nes ji turi susijusių gėlių.");
+        } else {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+            showAlert("Įvyko klaida, bandykite dar kartą.");
+        }
+    }
+}
+
+async function updatePosition(positionId) {
+    const apiUrl = 'http://localhost:8080/api/planting_positions';
+    const name = document.getElementById('editPositionInput').value;
+    try {
+        await axios.put(`${apiUrl}/${positionId}`, { name: name }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        fetchPositions();
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        showAlert("Sodinimo vieta redaguota");
+        const inputContainer = document.getElementById('positionInputContainer');
+        inputContainer.innerHTML = '';
+    } catch (error) {
+        console.error('Error updating position:', error);
     }
 }
